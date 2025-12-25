@@ -19,8 +19,17 @@
 - Получает результаты проверки с указанием ошибок и итоговой оценки
 
 ## 3. Модели данных
-**Process...**
+**Classroom (Класс)**: Объединяет учителя и учеников в учебные группы (например "11Б").  
+**Поля:** name, teacher (ForeignKey к User), students (ManyToMany к User)
 
+**GradeScale (Шкала оценки)**: Настройки перевода процента выполненных заданий в школьную оценку.
+**Поля:** teacher (ForeignKey к User), threshold_1, threshold_2, threshold_3, threshold_4, threshold_5
+
+**HomeworkTemplate (Шаблон домашнего задания):** Описание конкретного ДЗ для класса с прикрепленным файлом и правильными ответами.  
+**Поля:** title, classroom (ForeignKey к Classroom), homework_file (FileField), questions (JSONField), correct_answers (JSONField), assigned_date, deadline, max_score, grade_scale (ForeignKey к GradeScale)
+
+**StudentSubmission (Ответ/оценка ученика):** Хранит ответы ученика на ДЗ и результаты проверки.  
+**Поля:** student (ForeignKey к User), homework_template (ForeignKey к HomeworkTemplate), answers (JSONField), auto_score, final_score, grade, graded, teacher_comment, submitted_at
 ## 4. Ключевой функционал
 **Process...**
 
