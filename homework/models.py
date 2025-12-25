@@ -2,6 +2,28 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Profile(models.Model):
+    ROLE_CHOICES = [
+        ("teacher", "Учитель"),
+        ("student", "Ученик"),
+    ]
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
+        verbose_name="Пользователь",
+    )
+    role = models.CharField(
+        "Роль",
+        max_length=15,
+        choices=ROLE_CHOICES,
+    )
+
+    def __str__(self):
+        return f'{self.user.username} ({self.user.get_role_display()})'
+
+
 class Classroom(models.Model):
     name = models.CharField("Имя класса", max_length=64)
     teacher = models.ForeignKey(
@@ -31,7 +53,7 @@ class GradeScale(models.Model):
     threshold_2 = models.PositiveIntegerField("Порог для 2", default=30)
     threshold_3 = models.PositiveIntegerField("Порог для 3", default=51)
     threshold_4 = models.PositiveIntegerField("Порог для 4", default=71)
-    threshold_5 = models.PositiveIntegerField("Порог для 4", default=89)
+    threshold_5 = models.PositiveIntegerField("Порог для 5", default=89)
 
     def __str__(self):
         return f'Шкала учителя {self.teacher.username}'
@@ -90,4 +112,4 @@ class StudentSubmission(models.Model):
     submitted_at = models.DateTimeField("Время отправки", auto_now_add=True)
 
     def __str__(self):
-        return f"{self.student.username} - {self.homework_template.title}"
+        return f'{self.student.username} - {self.homework_template.title}'
