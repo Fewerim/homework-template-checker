@@ -16,12 +16,16 @@ class Profile(models.Model):
     )
     role = models.CharField(
         "Роль",
-        max_length=15,
+        max_length=10,
         choices=ROLE_CHOICES,
     )
 
     def __str__(self):
-        return f'{self.user.username} ({self.user.get_role_display()})'
+        return f'{self.user.username} ({self.get_role_display()})'
+
+    class Meta:
+        verbose_name = "Профиль"
+        verbose_name_plural = "Профили"
 
 
 class Classroom(models.Model):
@@ -41,6 +45,10 @@ class Classroom(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Класс"
+        verbose_name_plural = "Классы"
+
 
 class GradeScale(models.Model):
     teacher = models.ForeignKey(
@@ -57,6 +65,10 @@ class GradeScale(models.Model):
 
     def __str__(self):
         return f'Шкала учителя {self.teacher.username}'
+
+    class Meta:
+        verbose_name = "Шкала оценивания"
+        verbose_name_plural = "Шкалы оценивания"
 
 
 class HomeworkTemplate(models.Model):
@@ -89,6 +101,10 @@ class HomeworkTemplate(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        verbose_name = "Домашнее задание"
+        verbose_name_plural = "Домашние задания"
+
 
 class StudentSubmission(models.Model):
     student = models.ForeignKey(
@@ -113,3 +129,7 @@ class StudentSubmission(models.Model):
 
     def __str__(self):
         return f'{self.student.username} - {self.homework_template.title}'
+
+    class Meta:
+        verbose_name = "Ответ ученика"
+        verbose_name_plural = "Ответы учеников"
