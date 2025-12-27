@@ -19,8 +19,8 @@
 - Получает результаты проверки с указанием ошибок и итоговой оценки.
 
 ## 3. Модели данных
-**Profile (Профиль):** Расширение стандартного User, хранит роль.  
-**Поля:** user (OneToOneField к User), role (teacher / student)
+**Profile (Профиль):** Расширение стандартного User, хранит роль и данные о пользователе.  
+**Поля:** user (OneToOneField к User), role (teacher / student), first_name, last_name, patronymic, birth_date
 
 **Classroom (Класс):** Объединяет учителя и учеников в учебные группы (например "11Б").  
 **Поля:** name, teacher (ForeignKey к User), students (ManyToMany к User)

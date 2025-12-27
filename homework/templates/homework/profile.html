@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль</title>
+</head>
+<body>
+    <h1>Профиль</h1>
+    <p>{{ profile.last_name }} {{ profile.first_name }} {{ profile.patronymic }}</p>
+    <p>Дата рождения: {{ profile.birth_date }}</p>
+    <p>Роль: {{ profile.get_role_display }}</p>
+
+    <h2>Мои классы (как учитель)</h2>
+    <ul>
+      {% for cls in teacher_classes %}
+        <li>{{ cls.name }}</li>
+      {% empty %}
+        <li>Нет классов</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Классы, где я учусь</h2>
+    <ul>
+      {% for cls in student_classes %}
+        <li>{{ cls.name }}</li>
+      {% empty %}
+        <li>Нет классов</li>
+      {% endfor %}
+    </ul>
+
+    <a href="{% url 'logout' %}">Выйти из профиля</a>
+</body>
+</html>

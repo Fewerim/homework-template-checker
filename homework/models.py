@@ -14,14 +14,16 @@ class Profile(models.Model):
         related_name="profile",
         verbose_name="Пользователь",
     )
-    role = models.CharField(
-        "Роль",
-        max_length=10,
-        choices=ROLE_CHOICES,
-    )
+    role = models.CharField("Роль", max_length=10, choices=ROLE_CHOICES)
+
+    first_name = models.CharField("Имя", max_length=64, blank=True)
+    last_name = models.CharField("Фамилия", max_length=64, blank=True)
+    patronymic = models.CharField("Отчество", max_length=64, blank=True)
+    birth_date = models.DateField("Дата рождения", null=True, blank=True)
+
 
     def __str__(self):
-        return f'{self.user.username} ({self.get_role_display()})'
+        return f'{self.last_name} {self.first_name} ({self.get_role_display()})'
 
     class Meta:
         verbose_name = "Профиль"
@@ -33,11 +35,11 @@ class Classroom(models.Model):
     teacher = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="classes_as_teacher",
+        related_name="teacher_classrooms",
         verbose_name="Учитель")
     students = models.ManyToManyField(
         User,
-        related_name="classes_as_student",
+        related_name="classrooms",
         verbose_name="Ученики",
         blank=True,
     )
