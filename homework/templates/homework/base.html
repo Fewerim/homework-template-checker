@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Домашняя страница{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'homework/css/style.css' %}">
+</head>
+<body>
+<header class="head">
+    <h1><a href="{% url 'home' %}">Homework Template Checker</a></h1>
+    <nav>
+      <ul>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">Профиль</a></li>
+            <li><a href="{% url 'logout' %}">Выйти</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}">Войти</a></li>
+            <li><a href="{% url 'register' %}">Регистрация</a></li>
+          {% endif %}
+          <li><a href="{% url 'homework_list' %}">Домашние задания</a></li>
+      </ul>
+    </nav>
+</header>
+
+  <main>
+      {% block content %}
+        <h2>Шаблон домашнего задания</h2>
+      {% endblock %}
+  </main>
+</body>
+</html>

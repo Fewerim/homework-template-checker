@@ -8,7 +8,7 @@ from homework.models import Profile, Classroom, HomeworkTemplate
 
 
 def home_view(request):
-    return render(request, "homework/home.html")
+    return render(request, "homework/base.html")
 
 
 def homework_demo_view(request):

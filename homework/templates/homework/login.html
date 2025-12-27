@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Вход</title>
-</head>
-<body>
+{% extends "homework/base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
   <h1>Вход в профиль</h1>
 
   {% if form.errors %}
@@ -18,5 +16,4 @@
   </form>
 
   <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
-</body>
-</html>
+{% endblock %}

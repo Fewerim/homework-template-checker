@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Класс {{ classroom.name }}</title>
-</head>
-<body>
+{% extends "homework/base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
   <h1>Класс {{ classroom.name }}</h1>
 
   <h2>Учитель</h2>
@@ -16,17 +14,13 @@
   {% endif %}
 
   <h2>Ученики</h2>
-  <ul>
+  <ul class="class_students">
     {% for student in students %}
       <li>
-        {{ student.last_name }} {{ student.first_name }}
-        ({{ student.get_role_display }})
+        <p>{{ student.last_name }} {{ student.first_name }}</p>
       </li>
     {% empty %}
-      <li>В этом классе пока нет учеников.</li>
+      <li><p>В этом классе пока нет учеников.</p></li>
     {% endfor %}
   </ul>
-
-  <p><a href="{% url 'profile' %}">Назад в профиль</a></p>
-</body>
-</html>
+{% endblock %}

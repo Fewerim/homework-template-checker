@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Список домашних заданий</title>
-</head>
-<body>
+{% extends "homework/base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
   <h1>Мои домашние задания</h1>
 
   <ul>
@@ -18,7 +16,5 @@
       <li>Пока нет домашних заданий.</li>
     {% endfor %}
   </ul>
+{% endblock %}
 
-  <p><a href="{% url 'home' %}">На главную</a></p>
-</body>
-</html>
