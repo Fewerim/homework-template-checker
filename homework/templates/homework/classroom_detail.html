@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Класс {{ classroom.name }}</title>
+</head>
+<body>
+  <h1>Класс {{ classroom.name }}</h1>
+
+  <h2>Учитель</h2>
+  {% if teacher_profile %}
+    <p>{{ teacher_profile.last_name }} {{ teacher_profile.first_name }}
+       ({{ teacher_profile.get_role_display }})</p>
+  {% else %}
+    <p>Профиль учителя не заполнен.</p>
+  {% endif %}
+
+  <h2>Ученики</h2>
+  <ul>
+    {% for student in students %}
+      <li>
+        {{ student.last_name }} {{ student.first_name }}
+        ({{ student.get_role_display }})
+      </li>
+    {% empty %}
+      <li>В этом классе пока нет учеников.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{% url 'profile' %}">Назад в профиль</a></p>
+</body>
+</html>

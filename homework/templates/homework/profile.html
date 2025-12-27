@@ -10,24 +10,26 @@
     <p>Дата рождения: {{ profile.birth_date }}</p>
     <p>Роль: {{ profile.get_role_display }}</p>
 
-    <h2>Мои классы (как учитель)</h2>
-    <ul>
-      {% for cls in teacher_classes %}
-        <li>{{ cls.name }}</li>
-      {% empty %}
-        <li>Нет классов</li>
-      {% endfor %}
-    </ul>
+    {% if profile.role == "teacher" %}
+        <h2>Мои классы:</h2>
+        <ul>
+          {% for cls in teacher_classes %}
+            <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</li>
+          {% empty %}
+            <li>Нет классов</li>
+          {% endfor %}
+        </ul>
+    {% else %}
+        <h2>Классы, где я учусь</h2>
+        <ul>
+          {% for cls in student_classes %}
+            <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</li>
+          {% empty %}
+            <li>Нет классов</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
 
-    <h2>Классы, где я учусь</h2>
-    <ul>
-      {% for cls in student_classes %}
-        <li>{{ cls.name }}</li>
-      {% empty %}
-        <li>Нет классов</li>
-      {% endfor %}
-    </ul>
-
-    <a href="{% url 'logout' %}">Выйти из профиля</a>
+    <p></p><a href="{% url 'logout' %}">Выйти из профиля</a></p>
 </body>
 </html>

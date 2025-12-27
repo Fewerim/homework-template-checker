@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список домашних заданий</title>
+</head>
+<body>
+  <h1>Мои домашние задания</h1>
+
+  <ul>
+    {% for hw in homeworks %}
+      <li>
+        {{ hw.title }} -
+        класс: {{ hw.classroom.name }},
+        дедлайн: {{ hw.deadline }}
+      </li>
+    {% empty %}
+      <li>Пока нет домашних заданий.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{% url 'home' %}">На главную</a></p>
+</body>
+</html>

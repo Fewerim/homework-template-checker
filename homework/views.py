@@ -1,13 +1,21 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from homework.forms import RegisterForm
-from homework.models import Profile
+from homework.models import Profile, Classroom, HomeworkTemplate
 
 
-def register(request):
+def home_view(request):
+    return render(request, "homework/home.html")
+
+
+def homework_demo_view(request):
+    return render(request, "homework/homework_demo.html")
+
+
+def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -40,6 +48,12 @@ def login_view(request):
     return render(request, "homework/login.html", {"form" : form})
 
 
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
+
+
 @login_required
 def profile_view(request):
     profile = request.user.profile
@@ -53,7 +67,33 @@ def profile_view(request):
     return render(request, "homework/profile.html", context)
 
 
-def logout_view(request):
-    logout(request)
-    return redirect("home")
+@login_required
+def classroom_detail_view(request, pk):
+    classroom = get_object_or_404(Classroom, pk=pk)
+
+    students = Profile.objects.filter(user__in=classroom.students.all())
+
+    teacher_profile = Profile.objects.filter(user=classroom.teacher).first()
+
+    context = {
+        "classroom": classroom,
+        "students": students,
+        "teacher_profile": teacher_profile,
+    }
+    return render(request, "homework/classroom_detail.html", context)
+
+
+@login_required
+def homework_list_view(request):
+    user = request.user
+
+    if user.profile.role == "teacher":
+        classrooms = Classroom.objects.filter(teacher=user)
+    else:
+        classrooms = Classroom.objects.filter(students=user)
+
+    homeworks = HomeworkTemplate.objects.filter(classroom__in=classrooms).distinct()
+    context = {"homeworks": homeworks}
+
+    return render(request, "homework/homework_list.html", context)
 
