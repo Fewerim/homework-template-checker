@@ -5,28 +5,27 @@
 {% block content %}
     <h1>Профиль</h1>
     <p>{{ profile.last_name }} {{ profile.first_name }} {{ profile.patronymic }}</p>
-    <p>Дата рождения: {{ profile.birth_date }}</p>
-    <p>Роль: {{ profile.get_role_display }}</p>
+    <p><strong>Дата рождения:</strong> {{ profile.birth_date }}</p>
+    <p><strong>Роль:</strong> {{ profile.get_role_display }}</p>
 
     <div class="profile_classes">
+        <h2>Мои классы</h2>
          {% if profile.role == "teacher" %}
-        <h2>Мои классы (как учитель)</h2>
-        <ul>
-          {% for cls in teacher_classes %}
-            <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a></li>
-          {% empty %}
-            <li>Нет классов</li>
-          {% endfor %}
-        </ul>
-    {% else %}
-        <h2>Классы, где я учусь</h2>
-        <ul>
-          {% for cls in student_classes %}
-            <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a></li>
-          {% empty %}
-            <li>Нет классов</li>
-          {% endfor %}
-        </ul>
-    {% endif %}
+            <ul>
+              {% for cls in teacher_classes %}
+                <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a></li>
+              {% empty %}
+                <li>Нет классов</li>
+              {% endfor %}
+            </ul>
+        {% else %}
+            <ul>
+              {% for cls in student_classes %}
+                <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a></li>
+              {% empty %}
+                <li>Нет классов</li>
+              {% endfor %}
+            </ul>
+        {% endif %}
     </div>
 {% endblock %}

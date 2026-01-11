@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+from django.conf.global_settings import STATIC_ROOT
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +27,9 @@ SECRET_KEY = 'django-insecure-#fwg&fa-_ur#%@%$m@wzoa1%f(kr1c$56(*^)v*)vth5t8d#t%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fewerim.pythonanywhere.com', '127.0.0.1', '.pythonanywhere.com']
+STATIC_ROOT = "/home/fewerim/PP-Python/static"
+STATIC_URL = '/static/'
 
 
 # Application definition
