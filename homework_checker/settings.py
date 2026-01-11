@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 from django.conf.global_settings import STATIC_ROOT
@@ -27,9 +27,9 @@ SECRET_KEY = 'django-insecure-#fwg&fa-_ur#%@%$m@wzoa1%f(kr1c$56(*^)v*)vth5t8d#t%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['fewerim.pythonanywhere.com', '127.0.0.1', '.pythonanywhere.com']
-STATIC_ROOT = "/home/fewerim/PP-Python/static"
-STATIC_URL = '/static/'
+ALLOWED_HOSTS = ['fewerim.pythonanywhere.com', '127.0.0.1']
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 
 # Application definition
