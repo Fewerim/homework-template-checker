@@ -3,29 +3,58 @@
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
-    <h1>Профиль</h1>
-    <p>{{ profile.last_name }} {{ profile.first_name }} {{ profile.patronymic }}</p>
-    <p><strong>Дата рождения:</strong> {{ profile.birth_date }}</p>
-    <p><strong>Роль:</strong> {{ profile.get_role_display }}</p>
+<section class="page">
+  <div class="page__container">
 
-    <div class="profile_classes">
-        <h2>Мои классы</h2>
-         {% if profile.role == "teacher" %}
-            <ul>
-              {% for cls in teacher_classes %}
-                <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a></li>
-              {% empty %}
-                <li>Нет классов</li>
-              {% endfor %}
-            </ul>
-        {% else %}
-            <ul>
-              {% for cls in student_classes %}
-                <li><a href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a></li>
-              {% empty %}
-                <li>Нет классов</li>
-              {% endfor %}
-            </ul>
-        {% endif %}
+    <header class="page__header">
+      <h1 class="page__title">Профиль</h1>
+    </header>
+
+    <div class="card">
+      <div class="profile">
+        <div class="profile__name">
+          {{ profile.last_name }} {{ profile.first_name }} {{ profile.patronymic }}
+        </div>
+
+        <dl class="profile__meta">
+          <div class="profile__row">
+            <dt>Дата рождения</dt>
+            <dd>{{ profile.birth_date }}</dd>
+          </div>
+          <div class="profile__row">
+            <dt>Роль</dt>
+            <dd>{{ profile.get_role_display }}</dd>
+          </div>
+        </dl>
+      </div>
     </div>
+
+    <div class="card">
+      <h2 class="card__title">Мои классы</h2>
+
+      {% if profile.role == "teacher" %}
+        <ul class="chips">
+          {% for cls in teacher_classes %}
+            <li class="chips__item">
+              <a class="chip" href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a>
+            </li>
+          {% empty %}
+            <li class="muted">Нет классов</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <ul class="chips">
+          {% for cls in student_classes %}
+            <li class="chips__item">
+              <a class="chip" href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a>
+            </li>
+          {% empty %}
+            <li class="muted">Нет классов</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
 {% endblock %}

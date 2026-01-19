@@ -1,7 +1,67 @@
 {% extends "homework/base.html" %}
 
-{% block title %}Регистрация{% endblock %}
+{% block title %}Домашняя страница{% endblock %}
 
 {% block content %}
-  <h1>Soon...</h1>
+<section class="page">
+  <div class="page__container">
+    <div class="card">
+      <h1 class="page__title">Демо: домашнее задание</h1>
+
+      {% if user.is_authenticated %}
+        <p class="muted">Ученик: {{ user.username }}</p>
+      {% endif %}
+
+      {% if submitted %}
+        <div class="alert">Ответы отправлены.</div>
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert--danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        <table class="qa-table">
+          <thead>
+            <tr>
+              <th class="qa-table__num">№</th>
+              <th>Вопрос</th>
+              <th>Ответ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="qa-table__num">1</td>
+              <td>{{ demo_questions.0 }}</td>
+              <td>
+                {{ form.a1 }}
+                {% if form.a1.errors %}<div class="form__error">{{ form.a1.errors }}</div>{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td class="qa-table__num">2</td>
+              <td>{{ demo_questions.1 }}</td>
+              <td>
+                {{ form.a2 }}
+                {% if form.a2.errors %}<div class="form__error">{{ form.a2.errors }}</div>{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td class="qa-table__num">3</td>
+              <td>{{ demo_questions.2 }}</td>
+              <td>
+                {{ form.a3 }}
+                {% if form.a3.errors %}<div class="form__error">{{ form.a3.errors }}</div>{% endif %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button type="submit" class="btn btn--primary">Отправить</button>
+      </form>
+    </div>
+  </div>
+</section>
 {% endblock %}

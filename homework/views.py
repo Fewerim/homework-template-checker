@@ -3,13 +3,32 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 
-from homework.forms import RegisterForm
+from homework.forms import RegisterForm, DemoHomeworkForm
 from homework.models import Profile, Classroom, HomeworkTemplate
 
 
-def home_view(request):
-    return render(request, "homework/base.html")
+DEMO_QUESTIONS = [
+    "2 + 2 = ?",
+    "Столица Франции?",
+    "Назови 1 язык программирования.",
+]
 
+def home_view(request):
+    if request.method == "POST":
+        form = DemoHomeworkForm(request.POST)
+        if form.is_valid():
+            return render(request, "homework/homework_demo.html", {
+                "form": form,
+                "demo_questions": DEMO_QUESTIONS,
+                "submitted": True,
+            })
+    else:
+        form = DemoHomeworkForm()
+
+    return render(request, "homework/homework_demo.html", {
+        "form": form,
+        "demo_questions": DEMO_QUESTIONS,
+    })
 
 def homework_demo_view(request):
     return render(request, "homework/homework_demo.html")

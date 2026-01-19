@@ -1,26 +1,44 @@
 {% extends "homework/base.html" %}
 
-{% block title %}Регистрация{% endblock %}
+{% block title %}Класс {{ classroom.name }}{% endblock %}
 
 {% block content %}
-  <h1>Класс {{ classroom.name }}</h1>
+<section class="page">
+  <div class="page__container">
 
-  <h2>Учитель</h2>
-  {% if teacher_profile %}
-    <p>{{ teacher_profile.last_name }} {{ teacher_profile.first_name }}
-       ({{ teacher_profile.get_role_display }})</p>
-  {% else %}
-    <p>Профиль учителя не заполнен.</p>
-  {% endif %}
+    <header class="page__header">
+      <h1 class="page__title">Класс {{ classroom.name }}</h1>
+    </header>
 
-  <h2>Ученики</h2>
-  <ul class="class_students">
-    {% for student in students %}
-      <li>
-        <p>{{ student.last_name }} {{ student.first_name }}</p>
-      </li>
-    {% empty %}
-      <li><p>В этом классе пока нет учеников.</p></li>
-    {% endfor %}
-  </ul>
+    <div class="grid-2">
+      <div class="card">
+        <h2 class="card__title">Учитель</h2>
+
+        {% if teacher_profile %}
+          <p class="meta">
+            {{ teacher_profile.last_name }} {{ teacher_profile.first_name }}
+            <span class="badge">{{ teacher_profile.get_role_display }}</span>
+          </p>
+        {% else %}
+          <p class="muted">Профиль учителя не заполнен.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h2 class="card__title">Ученики</h2>
+
+        <ul class="list">
+          {% for student in students %}
+            <li class="list__item">
+              <span class="list__title">{{ student.last_name }} {{ student.first_name }}</span>
+            </li>
+          {% empty %}
+            <li class="muted">В этом классе пока нет учеников.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
 {% endblock %}
