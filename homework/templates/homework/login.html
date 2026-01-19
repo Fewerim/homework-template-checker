@@ -3,17 +3,43 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-  <h1>Вход в профиль</h1>
+<section class="auth">
+  <div class="auth-card">
+    <header class="auth-card__header">
+      <h1 class="auth-card__title">Вход</h1>
+      <p class="auth-card__subtitle">Войдите, чтобы открыть профиль и домашние задания.</p>
+    </header>
 
-  {% if form.errors %}
-    <p style="color:red;">Неверный логин или пароль.</p>
-  {% endif %}
+    {% if form.non_field_errors %}
+      <div class="alert alert--danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Войти</button>
-  </form>
+    <form method="post" class="form">
+      {% csrf_token %}
 
-  <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+      {% for field in form %}
+        <div class="form__group">
+          {{ field.label_tag }}
+
+          <div class="form__control">
+            {{ field }}
+          </div>
+
+          {% if field.errors %}
+            <div class="form__error">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn--primary btn--block">Войти</button>
+    </form>
+
+    <footer class="auth-card__footer">
+      <span>Нет аккаунта?</span>
+      <a href="{% url 'register' %}">Зарегистрироваться</a>
+    </footer>
+  </div>
+</section>
 {% endblock %}

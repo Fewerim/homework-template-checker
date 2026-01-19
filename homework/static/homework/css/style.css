@@ -1,8 +1,19 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
-    font-family: system-ui, sans-serif;
+    font-family: "Montserrat", sans-serif;
     background-color: #f5f5f5;
+    font-width: bold;
     margin: 0;
     padding: 10px 20px;
+}
+
+a {
+    text-decoration: underline;
+    font-weight: 900;
+    color: #16BAC5;
 }
 
 h1, h2, p {
@@ -83,4 +94,106 @@ h1, h2, p {
 .class_students li {
     list-style: none;
 }
+
+.auth{
+  min-height: calc(100vh - 120px);
+  display: grid;
+  place-items: center;
+  padding: 24px 12px;
+}
+
+.auth-card{
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1px solid #e8e8ee;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.auth-card__header{ margin-bottom: 14px; text-align: center }
+.auth-card__title{ margin: 0 0 6px; font-size: 24px; }
+.auth-card__subtitle{ margin: 0; color: #667085; font-size: 14px; }
+
+.form__group{ margin-bottom: 12px; }
+
+.form__group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #344054;
+}
+
+.form__control input,
+.form__control select,
+.form__control textarea{
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  font-size: 14px;
+}
+
+.form__control input:focus,
+.form__control select:focus,
+.form__control textarea:focus{
+  border-color: #5b6cff;
+  box-shadow: 0 0 0 4px rgba(91,108,255,.15);
+}
+
+.form__error{
+  margin-top: 6px;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.form__help{
+  margin-top: 6px;
+  font-size: 12px;
+  color: #667085;
+}
+
+.alert{
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.alert--danger{
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #a8071a;
+}
+
+.btn{
+  border: 0;
+  display: inline-block;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn--primary{
+  background: #2d6cdf;
+  color: #fff;
+}
+
+.btn--primary:hover{ filter: brightness(.95); }
+.btn--block{ width: 100%; }
+
+.auth-card__footer{
+  margin-top: 14px;
+  text-align: center;
+  font-size: 14px;
+  color: #667085;
+}
+
+.auth-card__footer a{ margin-left: 6px; }
 
