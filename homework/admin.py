@@ -15,7 +15,7 @@ class ClassroomAdmin(admin.ModelAdmin):
 
 @admin.register(GradeScale)
 class GradeScaleAdmin(admin.ModelAdmin):
-    list_display = ("teacher", "threshold_2", "threshold_3", "threshold_4", "threshold_5")
+    list_display = ("threshold_2", "threshold_3", "threshold_4", "threshold_5")
 
 
 @admin.register(HomeworkTemplate)

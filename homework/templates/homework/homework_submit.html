@@ -1,0 +1,57 @@
+{% extends "homework/base.html" %}
+
+{% block title %}Сдать ДЗ — {{ hw.title }}{% endblock %}
+
+{% block content %}
+<section class="auth">
+  <div class="auth-card auth-card--wide">
+    <header class="auth-card__header">
+      <h1 class="auth-card__title">{{ hw.title }}</h1>
+      <p class="auth-card__subtitle">Класс: {{ hw.classroom.name }}. Дедлайн: {{ hw.deadline }}</p>
+    </header>
+
+    <div class="card">
+      <h2 class="card__title">Задание</h2>
+
+      {% if hw.homework_file %}
+        <a href="{{ hw.homework_file.url }}" target="_blank">Открыть файл</a>
+      {% endif %}
+
+      <p class="muted">{{ hw.description }}</p>
+    </div>
+
+    <form method="post" class="form">
+      {% csrf_token %}
+      {{ formset.management_form }}
+
+      <div class="card">
+        <h2 class="card__title">Ответы</h2>
+        <div class="table-wrap">
+          <table class="qa-table">
+            <thead>
+              <tr>
+                <th class="qa-table__num">№</th>
+                <th>Ответ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for f in formset %}
+                <tr>
+                  <td class="qa-table__num">
+                    {{ f.number }} {{ f.number.value }}
+                  </td>
+                  <td>{{ f.answer }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn btn--primary btn--block" type="submit">
+          Отправить
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

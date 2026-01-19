@@ -15,5 +15,11 @@ urlpatterns = [
     path("homework_list/", homework_list_view, name="homework_list"),
     path("profiles/<int:user_id>/", views.profile_detail, name="profile_detail"),
     path("classrooms/create/", views.classroom_create, name="classroom_create"),
-    path("classroom/<int:pk>/add_students/", views.classroom_add_students_view, name="classroom_add_students")
+    path("classroom/<int:pk>/add_students/", views.classroom_add_students_view, name="classroom_add_students"),
+    path("classroom/<int:classroom_id>/homework/create/", views.homework_create_view, name="homework_create"),
+
+    path("homework/<int:hw_id>/", views.homework_detail_view, name="homework_detail"),
+    path("homework/<int:hw_id>/submit/", views.homework_submit_view, name="homework_submit"),
+    path("homework/<int:hw_id>/submissions/<int:user_id>/", views.submission_review_view, name="submission_review"),
+    path("profile/progress.png", views.student_progress_png, name="student_progress_png"),
 ]

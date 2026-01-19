@@ -8,17 +8,15 @@
 
     <header class="page__header page__header--row">
       <h1 class="page__title">Мои домашние задания</h1>
-
-      {% if user.is_authenticated and user.profile.role == "teacher" %}
-        <a class="btn btn--primary" href="{% url 'home' %}">Создать домашнее задание</a>
-      {% endif %}
     </header>
 
     {% if homeworks %}
       <div class="hw-grid">
         {% for hw in homeworks %}
           <article class="card hw">
-            <h2 class="hw__title">{{ hw.title }}</h2>
+            <h2 class="hw__title">
+              <a href="{% url 'homework_detail' hw.id %}">{{ hw.title }}</a>
+            </h2>
 
             <div class="hw__meta">
               <span class="badge">Класс: {{ hw.classroom.name }}</span>

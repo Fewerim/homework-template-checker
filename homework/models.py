@@ -1,12 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Subject(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-
-    def __str__(self):
-        return self.name
-
 class Classroom(models.Model):
     name = models.CharField("Имя класса", max_length=64)
     teacher = models.ForeignKey(
@@ -56,20 +50,17 @@ class Profile(models.Model):
         verbose_name_plural = "Профили"
 
 class GradeScale(models.Model):
-    teacher = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="grade_scales",
-        verbose_name="Учитель",
-    )
+    # teacher = models.ForeignKey(
+    #     User,
+    #     on_delete=models.CASCADE,
+    #     related_name="grade_scales",
+    #     verbose_name="Учитель",
+    # )
     threshold_1 = models.PositiveIntegerField("Порог для 1", default=0)
     threshold_2 = models.PositiveIntegerField("Порог для 2", default=30)
     threshold_3 = models.PositiveIntegerField("Порог для 3", default=51)
     threshold_4 = models.PositiveIntegerField("Порог для 4", default=71)
     threshold_5 = models.PositiveIntegerField("Порог для 5", default=89)
-
-    def __str__(self):
-        return f'Шкала учителя {self.teacher.username}'
 
     class Meta:
         verbose_name = "Шкала оценивания"

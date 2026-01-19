@@ -1,0 +1,72 @@
+{% extends "homework/base.html" %}
+{% block title %}Проверка — {{ hw.title }}{% endblock %}
+
+{% block content %}
+<section class="page">
+  <div class="page__container">
+    <header class="page__header">
+      <h1 class="page__title">{{ hw.title }}</h1>
+      <p class="muted">
+        Проверка ученика: {{ student_profile.last_name }} {{ student_profile.first_name }}
+      </p>
+      <p class="muted">
+        Auto: {{ submission.auto_score }} | Итог (сейчас): {{ submission.final_score }}
+      </p>
+    </header>
+
+    <div class="card">
+      <h2 class="card__title">Задание</h2>
+      {% if hw.homework_file %}
+        <a href="{{ hw.homework_file.url }}" target="_blank">Открыть файл</a>
+      {% endif %}
+      <p class="muted">{{ hw.description }}</p>
+    </div>
+
+    <form method="post" class="form">
+      {% csrf_token %}
+
+      {{ formset.management_form }}
+
+      <div class="card">
+        <h2 class="card__title">Ответы ученика</h2>
+
+        <table class="qa-table">
+          <thead>
+            <tr>
+              <th class="qa-table__num">№</th>
+              <th>Ответ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in formset %}
+              <tr>
+                <td class="qa-table__num">
+                  {{ f.number }}
+                  {{ f.number.value }}
+                </td>
+                <td>{{ f.answer }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2 class="card__title">Итоговая оценка</h2>
+        <div class="form__group">
+          {{ score_form.final_score.label_tag }}
+          <div class="form__control">{{ score_form.final_score }}</div>
+          {% if score_form.final_score.errors %}
+            <div class="form__error">{{ score_form.final_score.errors }}</div>
+          {% endif %}
+        </div>
+
+        <button class="btn btn--primary btn--block" type="submit">Сохранить</button>
+        <a class="btn btn--secondary btn--block" href="{% url 'homework_detail' hw.id %}">
+          Назад
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -2,13 +2,61 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.forms import formset_factory
 
-from homework.models import Classroom
+from homework.models import Classroom, HomeworkTemplate
 
-ROLE_CHOICES = (
-    ("teacher", "Teacher"),
-    ("student", "Student"),
+
+ANSWER_FORMATS = (
+    ("text", "Текст"),
+    ("int", "Число"),
+    ("float", "Дробное"),
 )
+
+class ReviewAnswerRowForm(forms.Form):
+    number = forms.IntegerField(widget=forms.HiddenInput())
+    answer = forms.CharField(label="", required=False)
+
+ReviewAnswerFormSet = formset_factory(ReviewAnswerRowForm, extra=0)
+
+class SubmissionScoreForm(forms.Form):
+    final_score = forms.IntegerField(min_value=0, required=True, label="Итоговые баллы")
+
+class AnswerRowForm(forms.Form):
+    number = forms.IntegerField(widget=forms.HiddenInput())
+    answer = forms.CharField(label="", required=False)
+
+AnswerFormSet = formset_factory(AnswerRowForm, extra=0)
+
+class QuestionRowForm(forms.Form):
+    number = forms.IntegerField(label="№", min_value=1)
+    answer_format = forms.ChoiceField(label="Формат", choices=ANSWER_FORMATS)
+    correct_answer = forms.CharField(label="Правильный ответ")
+
+QuestionFormSet = formset_factory(QuestionRowForm, extra=1, can_delete=True)
+
+# ROLE_CHOICES = (
+#     ("teacher", "Teacher"),
+#     ("student", "Student"),
+# )
+
+class HomeworkTemplateCreateForm(forms.ModelForm):
+    class Meta:
+        model = HomeworkTemplate
+        fields = (
+            "title",
+            "description",
+            "homework_file",
+            "assigned_date",
+            "deadline",
+            "max_score",
+        )
+        widgets = {
+            "assigned_date": forms.DateInput(attrs={"type": "date"}),
+            "deadline": forms.DateInput(attrs={"type": "date"}),
+            "description": forms.Textarea(attrs={"rows": 3}),
+        }
+
 
 class StudentMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -67,7 +115,7 @@ class AddStudentsToClassForm(forms.Form):
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    role = forms.ChoiceField(choices=ROLE_CHOICES)
+    #role = forms.ChoiceField(choices=ROLE_CHOICES)
 
     last_name = forms.CharField(label="Фамилия")
     first_name = forms.CharField(label="Имя")
@@ -78,7 +126,6 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = (
             "username",
-            "role",
             "last_name",
             "first_name",
             "patronymic",

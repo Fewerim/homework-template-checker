@@ -62,11 +62,13 @@
       {% endif %}
     </div>
     {% if profile.role == "student" %}
-    <div class="card">
+      <div class="card">
         <header class="page__header page__header--row">
           <h2 class="card__title">Моя успеваемость</h2>
         </header>
-    </div>
+
+        <img src="{% url 'student_progress_png' %}" alt="График успеваемости" style="width:100%; height:auto;">
+      </div>
     {% endif %}
   </div>
 </section>

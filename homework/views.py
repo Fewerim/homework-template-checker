@@ -3,17 +3,20 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from matplotlib import pyplot as plt
 
-from homework.forms import RegisterForm, DemoHomeworkForm, ClassroomCreateForm, AddStudentsToClassForm
-from homework.models import Profile, Classroom, HomeworkTemplate
-
+from homework.forms import RegisterForm, DemoHomeworkForm, ClassroomCreateForm, AddStudentsToClassForm, \
+    HomeworkTemplateCreateForm, QuestionFormSet, AnswerFormSet, ReviewAnswerFormSet, SubmissionScoreForm
+from homework.models import Profile, Classroom, HomeworkTemplate, GradeScale, StudentSubmission
 
 DEMO_QUESTIONS = [
     "2 + 2 = ?",
     "Столица Франции?",
     "Назови 1 язык программирования.",
 ]
+BASE_ROLE = "student"
 
 
 def home_view(request):
@@ -38,6 +41,309 @@ def homework_demo_view(request):
     return render(request, "homework/homework_demo.html")
 
 
+@login_required
+def homework_create_view(request, classroom_id):
+    classroom = get_object_or_404(Classroom, pk=classroom_id)
+    if classroom.teacher_id != request.user.id:
+        return HttpResponseForbidden()
+
+    if request.method == "POST":
+        form = HomeworkTemplateCreateForm(request.POST, request.FILES)
+        formset = QuestionFormSet(request.POST, prefix="q")
+
+        if form.is_valid() and formset.is_valid():
+            grade_scale = GradeScale.objects.first()
+            if grade_scale is None:
+                form.add_error(None, "В системе нет шкалы оценивания. Создайте её в админке.")
+            else:
+                hw = form.save(commit=False)
+                hw.classroom = classroom
+                hw.grade_scale = grade_scale
+
+                questions = []
+                correct = {}
+
+                for row in formset.cleaned_data:
+                    if not row or row.get("DELETE"):
+                        continue
+
+                    num = row["number"]
+                    fmt = row["answer_format"]
+                    ca = (row["correct_answer"] or "").strip()
+
+                    questions.append({
+                        "number": num,
+                        "answer_format": fmt,
+                    })
+                    correct[str(num)] = ca
+
+                questions.sort(key=lambda x: x["number"])
+
+                hw.questions = questions
+                hw.correct_answers = correct
+                hw.save()
+
+                return redirect("classroom_detail", pk=classroom.id)
+    else:
+        form = HomeworkTemplateCreateForm()
+        formset = QuestionFormSet(prefix="q")
+
+    return render(request, "homework/homework_create.html", {
+        "classroom": classroom,
+        "form": form,
+        "formset": formset,
+    })
+
+def _calc_auto_score(hw, answers):
+    correct_map = hw.correct_answers or {}
+    auto_score = 0
+
+    def get_correct(num):
+        if isinstance(correct_map, dict):
+            return correct_map.get(str(num)) or correct_map.get(num) or ""
+        return ""
+
+    for q in (hw.questions or []):
+        num = q["number"]
+        fmt = q.get("answer_format", "text")
+
+        stud = (answers.get(str(num)) or answers.get(num) or "").strip()
+        corr = (get_correct(num) or "").strip()
+
+        if fmt == "text":
+            if stud.casefold() == corr.casefold():
+                auto_score += 1
+        elif fmt == "int":
+            try:
+                if int(stud) == int(corr):
+                    auto_score += 1
+            except (TypeError, ValueError):
+                pass
+        elif fmt == "float":
+            try:
+                s = float(stud.replace(",", "."))
+                c = float(corr.replace(",", "."))
+                if abs(s - c) < 1e-6:
+                    auto_score += 1
+            except (TypeError, ValueError):
+                pass
+
+    return auto_score
+
+@login_required
+def submission_review_view(request, hw_id, user_id):
+    hw = get_object_or_404(HomeworkTemplate, pk=hw_id)
+
+    # только учитель класса
+    if hw.classroom.teacher_id != request.user.id:
+        return HttpResponseForbidden()
+
+    student_profile = get_object_or_404(
+        Profile, user_id=user_id, role="student", classroom=hw.classroom
+    )
+
+    submission = StudentSubmission.objects.filter(
+        homework_template=hw,
+        student=student_profile.user
+    ).first()
+
+    if submission is None:
+        # ученик не сдал — показываем пустую таблицу (можно иначе)
+        submission = StudentSubmission(
+            homework_template=hw,
+            student=student_profile.user,
+            answers={},
+            auto_score=0,
+            final_score=0,
+            graded=False,
+        )
+
+    # строим initial по вопросам + текущим ответам ученика
+    initial_rows = [
+        {
+            "number": q["number"],
+            "answer": (submission.answers or {}).get(str(q["number"]), ""),
+        }
+        for q in (hw.questions or [])
+    ]
+
+    if request.method == "POST":
+        formset = ReviewAnswerFormSet(request.POST, prefix="r", initial=initial_rows)
+        score_form = SubmissionScoreForm(request.POST)
+
+        if formset.is_valid() and score_form.is_valid():
+            answers = {}
+            for row in formset.cleaned_data:
+                num = row["number"]
+                answers[str(num)] = (row["answer"] or "").strip()
+
+            auto_score = _calc_auto_score(hw, answers)
+            final_score = score_form.cleaned_data["final_score"]
+
+            # если это была “виртуальная” submission (не существовала) — создадим
+            if submission.pk is None:
+                submission = StudentSubmission.objects.create(
+                    homework_template=hw,
+                    student=student_profile.user,
+                    answers=answers,
+                    auto_score=auto_score,
+                    final_score=final_score,
+                    graded=True,
+                )
+            else:
+                submission.answers = answers
+                submission.auto_score = auto_score
+                submission.final_score = final_score
+                submission.graded = True
+                submission.save()
+
+            return redirect("homework_detail", hw_id=hw.id)
+    else:
+        formset = ReviewAnswerFormSet(prefix="r", initial=initial_rows)
+        score_form = SubmissionScoreForm(initial={"final_score": submission.final_score})
+
+    return render(request, "homework/submission_review.html", {
+        "hw": hw,
+        "student_profile": student_profile,
+        "submission": submission,
+        "formset": formset,
+        "score_form": score_form,
+    })
+
+@login_required
+def homework_detail_view(request, hw_id):
+    hw = get_object_or_404(HomeworkTemplate, pk=hw_id)
+
+    profile = getattr(request.user, "profile", None)
+    if profile is None:
+        return HttpResponseForbidden()
+
+    # 1) Учитель
+    if profile.role == "teacher":
+        if hw.classroom.teacher_id != request.user.id:
+            return HttpResponseForbidden()
+
+        students = (
+            Profile.objects
+            .filter(role="student", classroom=hw.classroom)
+            .select_related("user")
+            .order_by("last_name", "first_name")
+        )
+
+        submissions = StudentSubmission.objects.filter(homework_template=hw).select_related("student")
+        sub_by_user_id = {s.student_id: s for s in submissions}
+
+        # подготовим список для шаблона
+        rows = []
+        for st in students:
+            sub = sub_by_user_id.get(st.user_id)
+            rows.append({
+                "student_profile": st,
+                "submitted": sub is not None,
+                "submission": sub,  # тут auto_score/final_score/graded/submitted_at
+            })
+
+        return render(request, "homework/homework_detail_teacher.html", {
+            "hw": hw,
+            "rows": rows,
+        })
+
+    # 2) Ученик
+    if profile.role == "student":
+        if profile.classroom_id != hw.classroom_id:
+            return HttpResponseForbidden()
+        return redirect("homework_submit", hw_id=hw.id)
+
+    return HttpResponseForbidden()
+
+@login_required
+def homework_submit_view(request, hw_id):
+    hw = get_object_or_404(HomeworkTemplate, pk=hw_id)
+
+    # доступ: только ученик этого класса
+    if not hasattr(request.user, "profile") or request.user.profile.role != "student":
+        return HttpResponseForbidden()
+    if request.user.profile.classroom_id != hw.classroom_id:
+        return HttpResponseForbidden()
+
+    # если уже сдавал — можно либо запретить, либо разрешить пересдачу
+    submission = StudentSubmission.objects.filter(
+        homework_template=hw, student=request.user
+    ).first()
+
+    # initial для formset из hw.questions
+    initial = [{"number": q["number"]} for q in (hw.questions or [])]
+
+    if request.method == "POST":
+        formset = AnswerFormSet(request.POST, prefix="a", initial=initial)
+        if formset.is_valid():
+            answers = {}
+            for row in formset.cleaned_data:
+                num = row["number"]
+                answers[str(num)] = (row["answer"] or "").strip()
+
+            correct_map = hw.correct_answers or {}
+            auto_score = 0
+
+            def get_correct(num):
+                if isinstance(correct_map, dict):
+                    return correct_map.get(str(num)) or correct_map.get(num) or ""
+                return ""
+
+            for q in (hw.questions or []):
+                num = q["number"]
+                fmt = q.get("answer_format", "text")
+
+                stud = (answers.get(str(num)) or answers.get(num) or "").strip()
+                corr = (get_correct(num) or "").strip()
+
+                if fmt == "text":
+                    if stud.casefold() == corr.casefold():
+                        auto_score += 1
+                elif fmt == "int":
+                    try:
+                        if int(stud) == int(corr):
+                            auto_score += 1
+                    except (TypeError, ValueError):
+                        pass
+                elif fmt == "float":
+                    try:
+                        s = float(stud.replace(",", "."))
+                        c = float(corr.replace(",", "."))
+                        if abs(s - c) < 1e-6:
+                            auto_score += 1
+                    except (TypeError, ValueError):
+                        pass
+
+            if submission is None:
+                submission = StudentSubmission.objects.create(
+                    student=request.user,
+                    homework_template=hw,
+                    answers=answers,
+                    auto_score=auto_score,
+                    final_score=auto_score,  # или 0 до проверки учителем
+                    graded=False,
+                )
+            else:
+                submission.answers = answers
+                submission.auto_score = auto_score
+                submission.final_score = auto_score
+                submission.graded = False
+                submission.save()
+
+            return redirect("homework_list")
+    else:
+        if submission:
+            initial = [{"number": q["number"], "answer": (submission.answers or {}).get(str(q["number"]), "")}
+                       for q in (hw.questions or [])]
+        formset = AnswerFormSet(prefix="a", initial=initial)
+
+    return render(request, "homework/homework_submit.html", {
+        "hw": hw,
+        "formset": formset,
+        "submission": submission,
+    })
+
 def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -46,12 +352,11 @@ def register_view(request):
 
             Profile.objects.create(
                 user=user,
-                role=form.cleaned_data["role"],
+                role=BASE_ROLE,
                 last_name=form.cleaned_data["last_name"],
                 first_name=form.cleaned_data["first_name"],
                 patronymic=form.cleaned_data.get("patronymic", ""),
                 birth_date=form.cleaned_data.get("birth_date"),
-                # classroom здесь НЕ назначаем на регистрации, если не выбираешь класс
             )
             login(request, user)
             return redirect("profile")
@@ -79,6 +384,42 @@ def logout_view(request):
     logout(request)
     return redirect("home")
 
+
+@login_required
+def student_progress_png(request):
+    qs = (
+        StudentSubmission.objects
+        .filter(student=request.user)
+        .select_related("homework_template")
+        .order_by("homework_template__deadline")
+    )
+
+    labels = [s.homework_template.title for s in qs]
+    scores = [s.final_score for s in qs]
+    max_scores = [s.homework_template.max_score for s in qs]
+
+    fig, ax = plt.subplots(figsize=(10, 3))
+
+    if scores:
+        ax.plot(range(len(scores)), scores, marker="o", label="Итог")
+        ax.plot(range(len(max_scores)), max_scores, linestyle="--", label="Макс.")
+        ax.set_xticks(range(len(labels)))
+        ax.set_xticklabels(labels, rotation=20, ha="right")
+    else:
+        ax.text(0.5, 0.5, "Пока нет сданных работ", ha="center", va="center")
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    ax.set_title("Моя успеваемость")
+    ax.set_ylabel("Баллы")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+
+    response = HttpResponse(content_type="image/png")
+    fig.tight_layout()
+    fig.savefig(response, format="png")
+    plt.close(fig)
+    return response
 
 @login_required
 def profile_view(request):

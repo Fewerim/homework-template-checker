@@ -39,12 +39,20 @@
           {% endfor %}
         </ul>
       </div>
-      {% if request.user.profile.role == "teacher" %}
+      {% if request.user.profile.role == "teacher" and classroom.teacher_id == request.user.id %}
         <div class="card">
-          <a class="btn btn--primary" href="{% url 'classroom_add_students' classroom.id %}">
+          <a class="btn btn--primary btn--block" href="{% url 'classroom_add_students' classroom.id %}">
             Добавить учеников
           </a>
         </div>
+      {% endif %}
+      {% if request.user.profile.role == "teacher" and classroom.teacher_id == request.user.id %}
+      <div class="card">
+        <a class="btn btn--primary btn--block"
+           href="{% url 'homework_create' classroom.id %}">
+          Создать домашнее задание
+        </a>
+      </div>
       {% endif %}
     </div>
 

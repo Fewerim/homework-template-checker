@@ -1,0 +1,55 @@
+{% extends "homework/base.html" %}
+{% block title %}{{ hw.title }}{% endblock %}
+
+{% block content %}
+<section class="page">
+  <div class="page__container">
+    <header class="page__header">
+      <h1 class="page__title">{{ hw.title }}</h1>
+      <p class="muted">Класс: {{ hw.classroom.name }}. Дедлайн: {{ hw.deadline }}</p>
+    </header>
+
+    <div class="card">
+      <h2 class="card__title">Задание</h2>
+      {% if hw.homework_file %}
+        <a href="{{ hw.homework_file.url }}" target="_blank">Открыть файл</a>
+      {% endif %}
+      <p class="muted">{{ hw.description }}</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">Сдачи</h2>
+
+      <table class="qa-table">
+        <thead>
+          <tr>
+            <th>Ученик</th>
+            <th>Статус</th>
+            <th>Auto</th>
+            <th>Итог</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>{{ r.student_profile.last_name }} {{ r.student_profile.first_name }}</td>
+              <td>{% if r.submitted %}Сдал{% else %}Не сдал{% endif %}</td>
+              <td>{% if r.submission %}{{ r.submission.auto_score }}{% else %}-{% endif %}</td>
+              <td>{% if r.submission %}{{ r.submission.final_score }}{% else %}-{% endif %}</td>
+              <td>
+                {% if r.submitted %}
+                  <a class="btn btn--primary"
+                     href="{% url 'submission_review' hw.id r.student_profile.user.id %}">
+                    Проверить
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

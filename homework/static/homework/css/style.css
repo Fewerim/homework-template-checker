@@ -162,7 +162,7 @@ h1, h2, h3, p{ margin: 0; }
 }
 .btn--primary:hover{ background: var(--primary-hover); }
 
-.btn--block{ width: 100%; }
+.btn--block{ width: 100%; text-align: center; }
 
 .form__group{ margin-bottom: 12px; }
 
@@ -449,5 +449,38 @@ a.chip:active{
 }
 .btn--secondary:hover{
   background: var(--primary-hover);
+}
+
+/* 1) Кнопка удаления: как primary (белый текст всегда) */
+.q-remove.btn{
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+}
+.q-remove.btn:hover,
+.q-remove.btn:active{
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+/* если вдруг это <a>, тоже фиксируем */
+a.q-remove.btn,
+a.q-remove.btn:visited,
+a.q-remove.btn:hover,
+a.q-remove.btn:active{
+  color: #fff;
+}
+
+/* 2) Таблица не вылезает из card */
+.table-wrap{
+  width: 100%;
+  overflow-x: auto;
+}
+.qa-table{
+  width: 100%;
+}
+
+.auth-card--wide{
+  max-width: 980px;     /* или 1100px */
 }
 

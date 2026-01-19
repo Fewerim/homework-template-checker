@@ -1,0 +1,188 @@
+{% extends "homework/base.html" %}
+
+{% block title %}Создать ДЗ — {{ classroom.name }}{% endblock %}
+
+{% block content %}
+<section class="auth">
+  <div class="auth-card auth-card--wide">
+    <header class="auth-card__header">
+      <h1 class="auth-card__title">Создать домашнее задание</h1>
+      <p class="auth-card__subtitle">Класс: {{ classroom.name }}. Заполните форму и сохраните.</p>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="form" id="hw-form">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert--danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="form__group">
+          {{ field.label_tag }}
+          <div class="form__control">{{ field }}</div>
+          {% if field.errors %}<div class="form__error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="card">
+        <h2 class="card__title">Вопросы</h2>
+
+        {% if formset.non_form_errors %}
+          <div class="alert alert--danger">{{ formset.non_form_errors }}</div>
+        {% endif %}
+
+        {{ formset.management_form }}
+
+        <div class="table-wrap">
+          <table class="qa-table" id="questions-table">
+            <thead>
+              <tr>
+                <th class="qa-table__num">№</th>
+                <th>Ответ ученика</th>
+                <th>Формат ответа</th>
+                <th>Правильный ответ</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody id="questions-body">
+              {% for f in formset %}
+                <tr class="q-row">
+                  <td class="qa-table__num">
+                    {{ f.number }}
+                    {% if f.number.errors %}<div class="form__error">{{ f.number.errors }}</div>{% endif %}
+                  </td>
+                  <td class="muted">—</td>
+                  <td>
+                    {{ f.answer_format }}
+                    {% if f.answer_format.errors %}<div class="form__error">{{ f.answer_format.errors }}</div>{% endif %}
+                  </td>
+                  <td>
+                    {{ f.correct_answer }}
+                    {% if f.correct_answer.errors %}<div class="form__error">{{ f.correct_answer.errors }}</div>{% endif %}
+                  </td>
+                  <td style="white-space: nowrap;">
+                    <span class="q-delete-hidden">
+                      {% if formset.can_delete %}{{ f.DELETE }}{% endif %}
+                    </span>
+                    <button type="button" class="btn btn--primarylike q-remove">Удалить</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn btn--primarylike btn--block" type="button" id="add-question">
+          + Добавить вопрос
+        </button>
+      </div>
+
+      <button class="btn btn--primary btn--block" type="submit">Создать</button>
+
+      <a class="btn btn--secondary btn--block"
+         href="{% url 'classroom_detail' classroom.id %}">
+        Назад к классу
+      </a>
+
+      <template id="empty-form-template">
+        <tr class="q-row" data-new="1">
+          <td class="qa-table__num">{{ formset.empty_form.number }}</td>
+          <td class="muted">—</td>
+          <td>{{ formset.empty_form.answer_format }}</td>
+          <td>{{ formset.empty_form.correct_answer }}</td>
+          <td style="white-space: nowrap;">
+            <span class="q-delete-hidden">
+              {% if formset.can_delete %}{{ formset.empty_form.DELETE }}{% endif %}
+            </span>
+            <button type="button" class="btn btn--primarylike q-remove">Удалить</button>
+          </td>
+        </tr>
+      </template>
+    </form>
+  </div>
+</section>
+
+<style>
+/* таблица не вылезает за card */
+.table-wrap{
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* скрываем DELETE, но оставляем его в форме */
+.q-delete-hidden{ display: none; }
+
+/* “как primary” для кнопок внутри таблицы */
+.btn--primarylike{
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+}
+.btn--primarylike:hover{
+  background: var(--primary-hover);
+  color: #fff;
+}
+.btn--primarylike:active{
+  background: var(--primary-hover);
+  color: #fff;
+}
+</style>
+
+<script>
+(function () {
+  const prefix = "q"; // должен совпадать с prefix во view
+  const form = document.getElementById("hw-form");
+  const body = document.getElementById("questions-body");
+  const addBtn = document.getElementById("add-question");
+  const tmpl = document.getElementById("empty-form-template");
+  const total = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+
+  if (!form || !body || !addBtn || !tmpl || !total) return;
+
+  function onRemoveClick(btn) {
+    const row = btn.closest(".q-row");
+    if (!row) return;
+
+    const del = row.querySelector(`input[name$="-DELETE"]`);
+    const isNew = row.dataset.new === "1";
+
+    if (isNew) {
+      // новая строка: удаляем полностью и уменьшаем TOTAL_FORMS
+      row.remove();
+      total.value = Math.max(0, parseInt(total.value, 10) - 1);
+      return;
+    }
+
+    // существующая строка: помечаем DELETE и скрываем
+    if (del) del.checked = true;
+    row.style.display = "none";
+  }
+
+  function bindRemoveButtons(root) {
+    root.querySelectorAll(".q-remove").forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => onRemoveClick(btn));
+    });
+  }
+
+  bindRemoveButtons(form);
+
+  addBtn.addEventListener("click", function () {
+    const index = parseInt(total.value, 10);
+    let html = tmpl.innerHTML.replaceAll("__prefix__", index);
+
+    const wrap = document.createElement("tbody");
+    wrap.innerHTML = html.trim();
+    const newRow = wrap.firstElementChild;
+
+    body.appendChild(newRow);
+    total.value = index + 1;
+
+    bindRemoveButtons(newRow);
+  });
+})();
+</script>
+{% endblock %}
