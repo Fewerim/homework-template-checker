@@ -1,6 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Subject(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Classroom(models.Model):
+    name = models.CharField("Имя класса", max_length=64)
+    teacher = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="teacher_classrooms",
+        verbose_name="Учитель")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Класс"
+        verbose_name_plural = "Классы"
 
 class Profile(models.Model):
     ROLE_CHOICES = [
@@ -15,7 +35,13 @@ class Profile(models.Model):
         verbose_name="Пользователь",
     )
     role = models.CharField("Роль", max_length=10, choices=ROLE_CHOICES)
-
+    classroom = models.ForeignKey(
+        "Classroom",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="students_profiles",
+    )
     first_name = models.CharField("Имя", max_length=64, blank=True)
     last_name = models.CharField("Фамилия", max_length=64, blank=True)
     patronymic = models.CharField("Отчество", max_length=64, blank=True)
@@ -28,29 +54,6 @@ class Profile(models.Model):
     class Meta:
         verbose_name = "Профиль"
         verbose_name_plural = "Профили"
-
-
-class Classroom(models.Model):
-    name = models.CharField("Имя класса", max_length=64)
-    teacher = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="teacher_classrooms",
-        verbose_name="Учитель")
-    students = models.ManyToManyField(
-        User,
-        related_name="classrooms",
-        verbose_name="Ученики",
-        blank=True,
-    )
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Класс"
-        verbose_name_plural = "Классы"
-
 
 class GradeScale(models.Model):
     teacher = models.ForeignKey(

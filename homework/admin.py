@@ -11,7 +11,6 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ("name", "teacher")
-    filter_horizontal = ("students",)
 
 
 @admin.register(GradeScale)

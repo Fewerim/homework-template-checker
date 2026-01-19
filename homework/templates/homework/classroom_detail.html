@@ -30,13 +30,22 @@
         <ul class="list">
           {% for student in students %}
             <li class="list__item">
-              <span class="list__title">{{ student.last_name }} {{ student.first_name }}</span>
+              <a class="list__title" href="{% url 'profile_detail' student.user.id %}">
+                {{ student.last_name }} {{ student.first_name }}
+              </a>
             </li>
           {% empty %}
             <li class="muted">В этом классе пока нет учеников.</li>
           {% endfor %}
         </ul>
       </div>
+      {% if request.user.profile.role == "teacher" %}
+        <div class="card">
+          <a class="btn btn--primary" href="{% url 'classroom_add_students' classroom.id %}">
+            Добавить учеников
+          </a>
+        </div>
+      {% endif %}
     </div>
 
   </div>

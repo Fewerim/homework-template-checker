@@ -1,0 +1,29 @@
+{% extends "homework/base.html" %}
+
+{% block title %}Добавить учеников — {{ classroom.name }}{% endblock %}
+
+{% block content %}
+<section class="auth">
+  <div class="auth-card">
+    <header class="auth-card__header">
+      <h1 class="auth-card__title">Добавить учеников</h1>
+      <p class="auth-card__subtitle">Класс: {{ classroom.name }}. Выберите учеников и сохраните.</p>
+    </header>
+
+    <form method="post" class="form">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form__group">
+          {{ field.label_tag }}
+          <div class="form__control">{{ field }}</div>
+          {% if field.errors %}<div class="form__error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+
+      <button class="btn btn--primary btn--block" type="submit">Добавить</button>
+      <a class="btn btn--secondary btn--block" href="{% url 'classroom_detail' classroom.id %}">Назад к классу</a>
+    </form>
+  </div>
+</section>
+{% endblock %}

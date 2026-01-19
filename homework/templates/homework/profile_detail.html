@@ -1,0 +1,47 @@
+{% extends "homework/base.html" %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<section class="page">
+  <header class="page__header">
+      <h1 class="page__title">Профиль</h1>
+  </header>
+  <div class="page__container">
+    <div class="card">
+      <p class="profile__name">
+        {{ profile.last_name }} {{ profile.first_name }} {{ profile.patronymic }}
+      </p>
+
+      <dl class="profile__meta">
+        <div class="profile__row">
+          <dt>Дата рождения</dt>
+          <dd>{{ profile.birth_date }}</dd>
+        </div>
+        <div class="profile__row">
+          <dt>Роль</dt>
+          <dd>{{ profile.get_role_display }}</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="card">
+      <h2 class="card__title">Класс</h2>
+
+      {% if profile.classroom %}
+        <a class="chip" href="{% url 'classroom_detail' profile.classroom.id %}">
+          {{ profile.classroom.name }}
+        </a>
+      {% else %}
+        <p class="muted">Ученик не состоит ни в одном классе.</p>
+      {% endif %}
+    </div>
+    {% if profile.role == "student" %}
+    <div class="card">
+        <header class="page__header page__header--row">
+          <h2 class="card__title">Успеваемость ученика</h2>
+        </header>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

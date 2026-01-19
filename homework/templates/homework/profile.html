@@ -30,7 +30,14 @@
     </div>
 
     <div class="card">
-      <h2 class="card__title">Мои классы</h2>
+      {% if profile.role == "teacher" %}
+        <header class="page__header page__header--row">
+          <h2 class="card__title">Мои классы</h2>
+          <a class="btn btn--primary" href="{% url 'classroom_create' %}">Создать класс</a>
+        </header>
+      {% else %}
+        <h2 class="card__title">Мой класс</h2>
+      {% endif %}
 
       {% if profile.role == "teacher" %}
         <ul class="chips">
@@ -43,18 +50,24 @@
           {% endfor %}
         </ul>
       {% else %}
-        <ul class="chips">
-          {% for cls in student_classes %}
+        {% if student_class %}
+          <ul class="chips">
             <li class="chips__item">
-              <a class="chip" href="{% url 'classroom_detail' cls.id %}">{{ cls.name }}</a>
+              <a class="chip" href="{% url 'classroom_detail' student_class.id %}">{{ student_class.name }}</a>
             </li>
-          {% empty %}
-            <li class="muted">Нет классов</li>
-          {% endfor %}
-        </ul>
+          </ul>
+        {% else %}
+          <p class="muted">Нет класса</p>
+        {% endif %}
       {% endif %}
     </div>
-
+    {% if profile.role == "student" %}
+    <div class="card">
+        <header class="page__header page__header--row">
+          <h2 class="card__title">Моя успеваемость</h2>
+        </header>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
