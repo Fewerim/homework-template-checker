@@ -50,6 +50,15 @@
         </tbody>
       </table>
     </div>
+    <div class="card">
+      <h2 class="card__title">Статистика</h2>
+
+      <p class="muted">Кто сколько набрал</p>
+      <img src="{% url 'homework_stats_png' hw.id %}?mode=bar" alt="Статистика по ученикам" style="width:100%; height:auto;">
+
+      <p class="muted" style="margin-top: 12px;">Распределение итоговых баллов</p>
+      <img src="{% url 'homework_stats_png' hw.id %}?mode=hist" alt="Распределение баллов" style="width:100%; height:auto;">
+    </div>
   </div>
 </section>
 {% endblock %}

@@ -50,12 +50,6 @@ class Profile(models.Model):
         verbose_name_plural = "Профили"
 
 class GradeScale(models.Model):
-    # teacher = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name="grade_scales",
-    #     verbose_name="Учитель",
-    # )
     threshold_1 = models.PositiveIntegerField("Порог для 1", default=0)
     threshold_2 = models.PositiveIntegerField("Порог для 2", default=30)
     threshold_3 = models.PositiveIntegerField("Порог для 3", default=51)

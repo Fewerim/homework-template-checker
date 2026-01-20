@@ -37,9 +37,10 @@
     </div>
     {% if profile.role == "student" %}
     <div class="card">
-        <header class="page__header page__header--row">
-          <h2 class="card__title">Успеваемость ученика</h2>
-        </header>
+      <header class="page__header page__header--row">
+        <h2 class="card__title">Успеваемость ученика</h2>
+      </header>
+      <img src="{% url 'student_progress_png' profile.user.id %}" alt="График успеваемости" style="width:100%; height:auto;">
     </div>
     {% endif %}
   </div>

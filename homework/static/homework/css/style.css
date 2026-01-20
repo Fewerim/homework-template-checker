@@ -1,37 +1,24 @@
-/* =========================
-   Design tokens (единый стиль)
-   ========================= */
 :root{
   --bg: #f5f5f5;
   --card: #ffffff;
-
   --text: #111827;
   --muted: #667085;
-
   --primary: #16BAC5;
   --primary-hover: #139aa3;
-
   --border: #e8e8ee;
   --border-soft: #f0f1f5;
-
   --danger: #b42318;
   --danger-bg: #fff1f0;
   --danger-border: #ffccc7;
-
   --radius: 14px;
   --radius-sm: 10px;
-
   --shadow: 0 10px 30px rgba(0,0,0,.06);
-
-  --container: 980px;  /* ширина контента */
-  --gutter: 12px;      /* отступы по бокам на мобилке */
+  --container: 980px;
+  --gutter: 12px;
 }
 
-/* =========================
-   Reset / base
-   ========================= */
 html{ box-sizing: border-box; }
-*, *::before, *::after{ box-sizing: inherit; } /* удобный box-sizing reset */ /* [web:192] */
+*, *::before, *::after{ box-sizing: inherit; }
 
 body{
   font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -40,7 +27,9 @@ body{
   margin: 0;
 }
 
-/* ссылки */
+h1, h2, h3, p{ margin: 0; }
+.muted{ color: var(--muted); }
+
 a{
   color: var(--primary);
   font-weight: 700;
@@ -48,21 +37,14 @@ a{
 }
 a:hover{ color: var(--primary-hover); }
 
-/* типографика */
-h1, h2, h3, p{ margin: 0; }
-.muted{ color: var(--muted); }
-
-/* =========================
-   Layout (центрирование страниц)
-   ========================= */
 .page{
   padding: 20px 0;
 }
 
 .page__container{
   max-width: var(--container);
-  margin: 0 auto;            /* центрирование */
-  padding: 0 var(--gutter);  /* чтобы не липло к краям */
+  margin: 0 auto;
+  padding: 0 var(--gutter);
 }
 
 .page__header{
@@ -84,9 +66,6 @@ h1, h2, h3, p{ margin: 0; }
   line-height: 1.2;
 }
 
-/* =========================
-   Header / nav
-   ========================= */
 .head{
   text-align: center;
   padding: 16px 0;
@@ -109,23 +88,32 @@ h1, h2, h3, p{ margin: 0; }
   flex-wrap: wrap;
 }
 
-.head nav a{
+.head nav a,
+.chip,
+.q-remove.btn{
+  display: inline-block;
   text-decoration: none;
   color: #ffffff;
   background-color: var(--primary);
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   transition: background-color .2s ease, transform .1s ease;
+  font-weight: 700;
 }
-.head nav a:hover{
+
+.head nav a:hover,
+.chip:hover,
+.q-remove.btn:hover{
   background-color: var(--primary-hover);
   transform: translateY(-1px);
 }
-.head nav a:active{ transform: translateY(0); }
 
-/* =========================
-   Cards
-   ========================= */
+.head nav a:active,
+.chip:active,
+.q-remove.btn:active{
+  transform: translateY(0);
+}
+
 .card,
 .auth-card{
   background: var(--card);
@@ -142,9 +130,6 @@ h1, h2, h3, p{ margin: 0; }
   font-size: 18px;
 }
 
-/* =========================
-   Buttons
-   ========================= */
 .btn{
   border: 0;
   display: inline-block;
@@ -164,6 +149,15 @@ h1, h2, h3, p{ margin: 0; }
 
 .btn--block{ width: 100%; text-align: center; }
 
+.btn--secondary{
+  background: var(--primary);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn--secondary:hover{
+  background: var(--primary-hover);
+}
+
 .form__group{ margin-bottom: 12px; }
 
 .form__group label{
@@ -175,7 +169,8 @@ h1, h2, h3, p{ margin: 0; }
 
 .form__control input:not([type="checkbox"]):not([type="radio"]),
 .form__control select,
-.form__control textarea{
+.form__control textarea,
+.qa-input{
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #d0d5dd;
@@ -187,7 +182,8 @@ h1, h2, h3, p{ margin: 0; }
 
 .form__control input:not([type="checkbox"]):not([type="radio"]):focus,
 .form__control select:focus,
-.form__control textarea:focus{
+.form__control textarea:focus,
+.qa-input:focus{
   border-color: var(--primary);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
 }
@@ -202,6 +198,32 @@ h1, h2, h3, p{ margin: 0; }
   margin-top: 6px;
   color: var(--danger);
   font-size: 13px;
+}
+
+.form__control ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.form__control li label{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  cursor: pointer;
+}
+
+.form__control li input[type="checkbox"]{
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: 0 0 auto;
 }
 
 .alert{
@@ -285,19 +307,8 @@ h1, h2, h3, p{ margin: 0; }
 }
 
 .chip{
-  display: inline-block;
-  text-decoration: none;
-  color: #ffffff;
-  background-color: var(--primary);
-  padding: 8px 12px;
   border-radius: 999px;
-  transition: background-color .2s ease, transform .1s ease;
 }
-.chip:hover{
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-}
-.chip:active{ transform: translateY(0); }
 
 .grid-2{
   display: grid;
@@ -380,107 +391,28 @@ h1, h2, h3, p{ margin: 0; }
   font-weight: 800;
 }
 
-.qa-input{
+.table-wrap{
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #d0d5dd;
-  border-radius: var(--radius-sm);
-  outline: none;
-  background: #fff;
-  font-size: 14px;
+  overflow-x: auto;
 }
-.qa-input:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+
+.auth-card--wide{
+  max-width: 980px;
 }
 
 a.btn,
-a.btn:visited{
+a.btn:visited,
+a.chip,
+a.chip:visited{
+  margin-top: 0.5rem;
   color: #fff;
   text-decoration: none;
 }
 
 a.btn:hover,
-a.btn:active{
-  color: #fff;
-  text-decoration: none;
-}
-
-a.chip,
-a.chip:visited,
+a.btn:active,
 a.chip:hover,
 a.chip:active{
   color: #fff;
   text-decoration: none;
 }
-
-.form__control ul{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-
-.form__control li label{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  cursor: pointer;
-}
-
-.form__control li input[type="checkbox"]{
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  flex: 0 0 auto;
-}
-
-.btn--secondary{
-  margin-top: 12px;
-  text-align: center;
-  background: var(--primary);
-  color: var(--primary);
-  border: 1px solid var(--primary);
-}
-.btn--secondary:hover{
-  background: var(--primary-hover);
-}
-
-/* 1) Кнопка удаления: как primary (белый текст всегда) */
-.q-remove.btn{
-  background: var(--primary);
-  color: #fff;
-  border: 0;
-}
-.q-remove.btn:hover,
-.q-remove.btn:active{
-  background: var(--primary-hover);
-  color: #fff;
-}
-
-/* если вдруг это <a>, тоже фиксируем */
-a.q-remove.btn,
-a.q-remove.btn:visited,
-a.q-remove.btn:hover,
-a.q-remove.btn:active{
-  color: #fff;
-}
-
-/* 2) Таблица не вылезает из card */
-.table-wrap{
-  width: 100%;
-  overflow-x: auto;
-}
-.qa-table{
-  width: 100%;
-}
-
-.auth-card--wide{
-  max-width: 980px;     /* или 1100px */
-}
-
